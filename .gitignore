@@ -1,0 +1,7 @@
+.svn
+**/__pycache__
+**/*.pdf
+**/*.png
+**/*.npy
+.vs
+**/*.txt
