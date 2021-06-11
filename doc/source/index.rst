@@ -12,7 +12,7 @@ Duo Developers Manual
 
 .. note::
 
-   3DQI is a research software for medical image analysis. The binaries are free to use, and can be requested by sending an email to ``Cai.Wenli@mgh.harvard.edu``.
+   3DQI is a research software for medical image analysis. The binaries are free to use, and can be requested via email to ``Cai.Wenli@mgh.harvard.edu``.
 
 .. toctree::
    :maxdepth: 2
