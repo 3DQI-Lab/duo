@@ -13,7 +13,8 @@ Duo, a Python API (GNU General Public License v3.0), is an Effective Atomic Numb
 Refer to [License](license.txt).
 
 ## Contact
-Dr. Wenli Cai
-Assistant Professor of Radiology
-Massachusetts General Hospital
+Wenli Cai, Ph.D.<br/>
+Director, 3D Quantitative Imaging Lab, Massachusetts General Hospital<br/>
+Assistant Professor of Radiology, Harvard Medical School
+
 
