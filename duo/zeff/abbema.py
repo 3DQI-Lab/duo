@@ -9,7 +9,6 @@ import duo.core.dicom_decoder as dicom_decoder
 import matplotlib
 matplotlib.use('PDF')
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import duo.core.timer as timer
 import scipy
 import scipy.optimize

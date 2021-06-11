@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 plt.ion()
 
 from matplotlib.patches import Circle
-from mpl_toolkits.mplot3d import Axes3D
 import scipy
 import scipy.optimize
 import pydicom
