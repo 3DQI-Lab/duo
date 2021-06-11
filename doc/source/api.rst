@@ -7,3 +7,4 @@ API reference
    :maxdepth: 1
 
    api/duo
+

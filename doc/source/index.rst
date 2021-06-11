@@ -19,6 +19,7 @@ Duo Developers Manual
    :caption: Contents:
 
    installation
+   features
    api
 
 Indices and tables
