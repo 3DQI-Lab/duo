@@ -21,6 +21,15 @@ class Bourque:
     """ Critical: By default Bourque parameterizes electron microscopic cross-section (exs) using polynomial approximation.
         At low-energy range, when exs changes abruptly due to absorption, curve fitting would have large error.
 
+        :ivar method: Type of Bourque coefficient calculator to apply.
+
+            - "original": Using polynomial.
+
+            - "chebyshev": Using Chebyshev polynomial.
+
+            - "bspline": Using cubic B-Spline.
+
+        :ivar bcc: Bourque coefficient calculator object.
         :ivar dList: Parameters of DER(Z) polynomial curve fitting.
         :ivar bs: Parameters of Z(DER) B-spline curve fitting.
     """
@@ -68,7 +77,10 @@ class Bourque:
     #------------------------------------------------------------
     #------------------------------------------------------------
     def CalculateZeffAtE(self, mat, energy):
-        """Based on ENDFB cross-section data
+        """Given material and energy, calculate Zeff.
+        This method calls :meth:`duo.zeff.bourque_coeff_calculator.BourqueCoeffCalculator.ParameterizeAtE`.
+        The curve fitting depends on :attr:`.method` which defaults to "bspline".
+        ENDFB cross-section data is used.
         """
         my_xs_tt = mat.CalculateElectronXSAtE(energy)
 
