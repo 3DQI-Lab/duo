@@ -16,14 +16,21 @@ def Func6(Z, d0, d1, d2, d3, d4, d5):
     return result
 
 #------------------------------------------------------------
-# Critical: Bourque parameterizes electron xs using polynomial approximation.
-# When xs changes abruptly due to absorption, curve fitting would become
-# really bad with large MSE
 #------------------------------------------------------------
 class Bourque:
+    """ Critical: By default Bourque parameterizes electron microscopic cross-section (exs) using polynomial approximation.
+        At low-energy range, when exs changes abruptly due to absorption, curve fitting would have large error.
+
+        :ivar dList: Parameters of DER(Z) polynomial curve fitting.
+        :ivar bs: Parameters of Z(DER) B-spline curve fitting.
+    """
+
     #------------------------------------------------------------
     #------------------------------------------------------------
     def __init__(self, com, method = "bspline"):
+        """Initialization method.
+
+        """
         self.elementTable = com.elementTable
         self.method = method
 
@@ -59,9 +66,10 @@ class Bourque:
         self.water.density = 1.0
 
     #------------------------------------------------------------
-    # based on endfb xs data
     #------------------------------------------------------------
     def CalculateZeffAtE(self, mat, energy):
+        """Based on ENDFB cross-section data
+        """
         my_xs_tt = mat.CalculateElectronXSAtE(energy)
 
         # mat.ShowInfo(energy)
@@ -109,9 +117,11 @@ class Bourque:
         return root
 
     #------------------------------------------------------------
-    # Given Ehigh, Elow, Z, calculate DER using parametric equation of exs in Z
     #------------------------------------------------------------
     def CalculateDualEnergyRatio(self, Ehigh, Elow, Z):
+        """Given Ehigh, Elow, Z, calculate DER using parametric equation of exs in Z
+
+        """
         self.bcc.ParameterizeAtE(Elow)
         exs_low = self.bcc.CalculateElectronXS(Z)
 
@@ -125,19 +135,23 @@ class Bourque:
         return der
 
     #------------------------------------------------------------
-    # Given Ehigh and Elow, derive
-    # --- the parametric equation of DER as a function of Z
-    # --- the parametric equation of Z as a function of DER
-    #
-    # Bourque states that Z and gamma are bijective in [1, 38]
-    # We noticed they are bijective in [1, 36]
-    #
-    # Following Bourque's method, we establish a relation (self.bs) between
-    # Z and DER, and use DER of an unknown material to predict its Z.
-    # The result would still be the same if we directly use exs_low / exs_high
-    # without considering water.
     #------------------------------------------------------------
     def ParameterizeDualEnergyRatioAndZ(self, Ehigh, Elow):
+        """
+        Given Ehigh and Elow, derive
+
+        * The parametric equation of DER as a function of Z.
+
+        * The parametric equation of Z as a function of DER.
+
+        Bourque states that Z and gamma are bijective in [1, 38]
+        We noticed they are bijective in [1, 36] using the ENDFB library.
+
+        Following Bourque's method, we establish a relation (:attr:`.bs`) between
+        Z and DER, and use DER of an unknown material to predict its Z.
+        The result would still be the same if we directly use exs_low / exs_high
+        without considering water.
+        """
         self.Ehigh = Ehigh
         self.Elow = Elow
 
@@ -169,9 +183,10 @@ class Bourque:
         self.bs = interpolate.BSpline(t, c, k, extrapolate = True)
 
     #------------------------------------------------------------
-    # Given Z, calculate DER using parametric equation of DER in Z
     #------------------------------------------------------------
     def CalculateDualEnergyRatio2(self, Z):
+        """Given Z, calculate DER using parametric equation of DER in Z
+        """
         return poly.polyval(Z, self.dList)
 
     #------------------------------------------------------------
@@ -225,9 +240,10 @@ class Bourque:
         return imageZeff
 
     #------------------------------------------------------------
-    # debugging purpose
     #------------------------------------------------------------
     def EvaluateSpline(self, mat, energy, Z):
+        """Debugging purpose
+        """
         self.bcc.ParameterizeAtE(energy)
 
         my_xs_tt = mat.CalculateElectronXSAtE(energy)
