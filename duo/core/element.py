@@ -39,23 +39,26 @@ class Element:
             print(result)
 
     #------------------------------------------------------------
-    # It turns out photoatomic total xs should use lin-lin interpolation!!!
-    # We compared lin-lin with log-log. Using lin-lin, an almost perfect match
-    # between calculated and reference data was observed.
-    # ref: https://www-nds.iaea.org/exfor/servlet/efhelp/interp.html
-    #
-    # According to Endfb photoatomic data notes:
-    # WARNING  - As a result the total cross section
-    #            MUST NOT be interpolated to define the
-    #            total between tabulated energies. The
-    #            ONLY consist way to define the total
-    #            between tabulated energies is to
-    #            interpolate all of the partials and
-    #            add them up.
-    # So it is incorrect to directly interpolate self.xsTable["total_ref"]
-    # The total microscopic cross-section must be calculated on the fly!!!
     #------------------------------------------------------------
     def CalculateTotalMicroXSAtE(self, energy):
+        """It turns out photoatomic total xs should use lin-lin interpolation!!!
+        We compared lin-lin with log-log. Using lin-lin, an almost perfect match
+        between calculated and reference data was observed.
+        ref: https://www-nds.iaea.org/exfor/servlet/efhelp/interp.html
+
+        According to Endfb photoatomic data notes:
+        WARNING  - As a result the total cross section
+                   MUST NOT be interpolated to define the
+                   total between tabulated energies. The
+                   ONLY consist way to define the total
+                   between tabulated energies is to
+                   interpolate all of the partials and
+                   add them up.
+        So it is incorrect to directly interpolate self.xsTable["total_ref"]
+        The total microscopic cross-section must be calculated on the fly!!!
+
+        """
+
         result = 0.0
 
         for key, value in self.xsTable.items():
