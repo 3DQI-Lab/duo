@@ -5,16 +5,21 @@ import duo.core.search_interp as si
 #------------------------------------------------------------
 #------------------------------------------------------------
 class Element:
+    """Class that manages element-specific data.
+
+    :ivar float AWR: atomic weight ratio relative to neutron
+    :ivar dictionary xsTable: Each (key, value) pair is (process_id, a list of :class:`.PhotoAtomicXS`).
+
+    """
+
     #------------------------------------------------------------
     #------------------------------------------------------------
     def __init__(self, Z = 0):
         self.Z = Z
         self.symbol = ""
         self.A = 0.0
-        self.AWR = 0.0 # atomic weight ratio relative to neutron
+        self.AWR = 0.0
 
-        # a dictionary
-        # each element is: lib_id (a string) : xsList (a list of PhotoAtomicXS)
         self.xsTable = {}
 
     #------------------------------------------------------------
@@ -41,21 +46,27 @@ class Element:
     #------------------------------------------------------------
     #------------------------------------------------------------
     def CalculateTotalMicroXSAtE(self, energy):
-        """It turns out photoatomic total xs should use lin-lin interpolation!!!
-        We compared lin-lin with log-log. Using lin-lin, an almost perfect match
+        """It turns out photoatomic total xs should use linear-linear interpolation!!!
+        We compared linear-linear with log-log. Using linear-linear, an almost perfect match
         between calculated and reference data was observed.
-        ref: https://www-nds.iaea.org/exfor/servlet/efhelp/interp.html
+
+        Reference: https://www-nds.iaea.org/exfor/servlet/efhelp/interp.html
 
         According to Endfb photoatomic data notes:
-        WARNING  - As a result the total cross section
-                   MUST NOT be interpolated to define the
-                   total between tabulated energies. The
-                   ONLY consist way to define the total
-                   between tabulated energies is to
-                   interpolate all of the partials and
-                   add them up.
-        So it is incorrect to directly interpolate self.xsTable["total_ref"]
-        The total microscopic cross-section must be calculated on the fly!!!
+
+        | WARNING  - As a result the total cross section
+        |            MUST NOT be interpolated to define the
+        |            total between tabulated energies. The
+        |            ONLY consist way to define the total
+        |            between tabulated energies is to
+        |            interpolate all of the partials and
+        |            add them up.
+
+        So it is incorrect to directly interpolate ``self.xsTable["total_ref"]``
+        The total microscopic cross-section must be calculated on the fly.
+
+        :param energy: Photon energy in keV.
+        :type energy: float.
 
         """
 

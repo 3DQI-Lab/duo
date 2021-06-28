@@ -4,6 +4,12 @@ import duo.nuclear_data.photoatomic.photoatomic_xs_io as xs
 #------------------------------------------------------------
 #------------------------------------------------------------
 class ElementTable:
+    """Class that manages all elements available.
+
+    :ivar dictionary elementList: Each (key, value) pair is (Z, :class:`.Element`).
+        This variable is simply a reference to ``PhotoAtomicXSIOManager.elementList``.
+
+    """
     #------------------------------------------------------------
     #------------------------------------------------------------
     def __init__(self, dataPath):

@@ -79,7 +79,7 @@ class Bourque:
     def CalculateZeffAtE(self, mat, energy):
         """Given material and energy, calculate Zeff.
         This method calls :meth:`duo.zeff.bourque_coeff_calculator.BourqueCoeffCalculator.ParameterizeAtE`.
-        The curve fitting depends on :attr:`.method` which defaults to "bspline".
+        The curve fitting depends on ``Bourque.method`` which defaults to "bspline".
         ENDFB cross-section data is used.
         """
         my_xs_tt = mat.CalculateElectronXSAtE(energy)
@@ -159,7 +159,7 @@ class Bourque:
         Bourque states that Z and gamma are bijective in [1, 38]
         We noticed they are bijective in [1, 36] using the ENDFB library.
 
-        Following Bourque's method, we establish a relation (:attr:`.bs`) between
+        Following Bourque's method, we establish a relation (``Bourque.bs``) between
         Z and DER, and use DER of an unknown material to predict its Z.
         The result would still be the same if we directly use exs_low / exs_high
         without considering water.

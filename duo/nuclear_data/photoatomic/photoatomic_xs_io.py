@@ -5,11 +5,19 @@ import duo.core.element as duoelement
 import duo.core.photoatomic_xs as duophotoatomic_xs
 
 #------------------------------------------------------------
-# Two formats of the ENDF-B-VIII.0 photoatomic libraries are used
-# ---- endfb format: for microscopic cross-section
-# ---- gnd format: for atomic weight ratio (AWR)
 #------------------------------------------------------------
 class PhotoAtomicXSIOManager:
+    """Class that manages photoatomic cross-section IO.
+    Two formats of the ENDF-B-VIII.0 photoatomic libraries are used
+
+    - endfb format: Conventional format. Used herein for the list of elements available.
+
+    - gnd format: Newer xml-based format. Used herein for both atomic weight ratio (AWR) and microscopic cross-section.
+
+    :ivar dictionary elementList: Each (key, value) pair is (Z, :class:`.Element`).
+
+    """
+
     #------------------------------------------------------------
     #------------------------------------------------------------
     def __init__(self, endfbDir="", gndDir=""):

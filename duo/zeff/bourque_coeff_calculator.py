@@ -47,7 +47,7 @@ class BourqueCoeffCalculator:
     #------------------------------------------------------------
     def CalculateElectronXS(self, Z):
         """Given Z, calculate electron microscopic cross-section.
-        This method must be used after a call to :meth:`.ParameterizeAtE`,
+        This method must be used after a call to :meth:`~ParameterizeAtE`,
         which calculates parameters based on the given energy.
 
         :param Z: Atomic number.
