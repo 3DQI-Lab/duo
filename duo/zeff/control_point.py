@@ -80,7 +80,7 @@ class ControlPointManager:
         if self.isToDumpIntermediateData:
             self.PlotDiscretePoint()
 
-            # self.PlotFullSurface()
+            self.PlotFullSurface()
 
             # self.PlotSelectedData()
 
@@ -236,6 +236,9 @@ class ControlPointManager:
     #------------------------------------------------------------
     #------------------------------------------------------------
     def PlotFullSurface(self):
+        """
+        Known issue: Matplotlib 3.4.2 still has a bug where 3D plot zorder is oftentimes ignored.
+        """
         print("--> Plot full surface")
 
         ZMax = 0.0
@@ -248,29 +251,34 @@ class ControlPointManager:
             if item.ZeffAve < ZMin:
                 ZMin = item.ZeffAve
 
-        fig = plt.figure(figsize=(16, 10))
+        fig = plt.figure(figsize=(10, 10))
         ax = fig.add_subplot(111, projection = '3d')
 
         #------------------------------------------------------------
         # plot surface
         #------------------------------------------------------------
-        x = np.linspace(-1000, 3095, 256)
-        y = np.linspace(-1000, 3095, 256)
+        x = np.linspace(-1000, 3095, 32)
+        y = np.linspace(-1000, 3095, 32)
         xx, yy = np.meshgrid(x, y)
         zz = self.rbf(xx, yy)
 
         # clamp
-        zz = np.where(zz < ZMin, ZMin, zz)
-        zz = np.where(zz > ZMax, ZMax, zz)
+        zeffMax = 11
+        zeffMin = 1
+        zz = np.where(zz > zeffMax, zeffMax, zz)
+        zz = np.where(zz < zeffMin, zeffMin, zz)
 
-        ax.plot_trisurf(xx.flatten(),
-                        yy.flatten(),
-                        zz.flatten(),
-                        cmap = cm.viridis,
+        ax.plot_surface(xx,
+                        yy,
+                        zz,
+                        cmap = 'jet',
                         antialiased = True,
-                        linewidth = 0,
-                        alpha = 0.5,
-                        zorder = -1)
+                        vmin = 1,
+                        vmax = 10,
+                        linewidth = 0.1,
+                        edgecolor='#00000088',
+                        alpha = 0.6,
+                        zorder = 1)
 
         #------------------------------------------------------------
         # plot points
@@ -288,7 +296,7 @@ class ControlPointManager:
             ax.text(self.cpListNist.xList[i],
                     self.cpListNist.yList[i],
                     self.cpListNist.zList[i] + 1,
-                    str(counter), fontsize = 10)
+                    str(counter), fontsize = 5)
 
             counter += 1
 
@@ -299,44 +307,43 @@ class ControlPointManager:
                        c = '#0000ff',
                        depthshade = False,
                        label = str(counter) + " : "+ self.cpListCai.textList[i],
-                       zorder = 6)
+                       zorder = 5)
 
             ax.text(self.cpListCai.xList[i],
                     self.cpListCai.yList[i],
                     self.cpListCai.zList[i] + 1,
-                    str(counter), fontsize = 10)
+                    str(counter), fontsize = 5)
 
             counter += 1
 
         ax.set_xlim([-1000, 3095])
-        ax.set_xlabel("CT number at 69.28 keV")
+        ax.set_xlabel("CT number at $E_{high}$ keV")
 
         ax.set_ylim([-1000, 3095])
-        ax.set_ylabel("CT number at 51.93 keV")
+        ax.set_ylabel("CT number at $E_{low}$ keV")
 
-        # upperZ = np.amax([np.amax(self.cpListNist.zList), np.amax(self.cpListCai.zList)]) + 1
-        ax.set_zlim(bottom = 0.0)
+        ax.set_zlim(zmin = 1, zmax = 11)
         ax.set_zlabel("Effective atomic number")
+        ax.set_zticks(np.arange(1, 13, 2)) # 1, 3, 5 ... 15
 
         # add vertical lines
         for i in range(len(self.cpListTotal.xList)):
             ax.plot([self.cpListTotal.xList[i], self.cpListTotal.xList[i]],
                     [self.cpListTotal.yList[i], self.cpListTotal.yList[i]],
-                    [0, self.cpListTotal.zList[i]],
+                    [1, self.cpListTotal.zList[i]],
                     color = '#000000', linestyle = 'dotted', linewidth = 1)
 
         # no simple way to customize 3d plot, so according to stackoverflow:
         # set pane color (background color)
-        ax.w_xaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
-        ax.w_yaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
-        ax.w_zaxis.set_pane_color((1.0, 1.0, 1.0, 1.0))
+        ax.w_xaxis.set_pane_color((0.9, 0.9, 0.9, 1.0))
+        ax.w_yaxis.set_pane_color((0.9, 0.9, 0.9, 1.0))
+        ax.w_zaxis.set_pane_color((0.9, 0.9, 0.9, 1.0))
 
         ax.tick_params(bottom = True, top = True, left = True, right = True)
-
         plt.legend(loc='center left', bbox_to_anchor=(1.07, 0.5), edgecolor = '#000000', shadow = True)
         fig.subplots_adjust(right = 0.7)
 
-        plt.savefig("full_surface.pdf")
+        plt.savefig("full_surface_" + self.method +".pdf", bbox_inches='tight')
 
     # #------------------------------------------------------------
     # #------------------------------------------------------------

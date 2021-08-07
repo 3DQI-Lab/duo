@@ -64,7 +64,7 @@ class ZeffTableGenerator:
         self.huHighKVPImage = None
 
         self.zeffMin = 1.0
-        self.zeffMax = 36.0
+        self.zeffMax = 11 # 36.0
 
         self.com = None
 
@@ -292,7 +292,7 @@ class ZeffTableGenerator:
         mappable = ax.imshow(imageZeff,
                       origin = 'lower',
                       interpolation = 'none',
-                      cmap = 'viridis',
+                      cmap = 'jet', #'viridis',
                       vmin = self.zeffMin,
                       vmax = self.zeffMax)
         #ax.set_title("Original Bourque")
