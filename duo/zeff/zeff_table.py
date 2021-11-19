@@ -64,7 +64,8 @@ class ZeffTableGenerator:
         self.huHighKVPImage = None
 
         self.zeffMin = 1.0
-        self.zeffMax = 11 # 36.0
+        self.zeffMax = 36.0
+        # self.zeffMax = 11
 
         self.com = None
 
@@ -285,14 +286,15 @@ class ZeffTableGenerator:
         myTickLabels = ["-1000", "0", "3095"]
 
         #fig = plt.figure(figsize = (20, 6))
-        fig = plt.figure(figsize = (7, 6))
+        fig = plt.figure(figsize = (5, 4))
         plt.subplots_adjust(wspace = 0.2, hspace = 0.1, right = 0.8)
 
         ax = fig.add_subplot(1, 1, 1)
         mappable = ax.imshow(imageZeff,
                       origin = 'lower',
                       interpolation = 'none',
-                      cmap = 'jet', #'viridis',
+                      cmap = 'viridis',
+                      # cmap = 'jet',
                       vmin = self.zeffMin,
                       vmax = self.zeffMax)
         #ax.set_title("Original Bourque")
@@ -302,7 +304,7 @@ class ZeffTableGenerator:
         ax.set_yticklabels(myTickLabels)
         ax.axhline(y = myTicks[1], color = "#000000", linestyle = "-", linewidth = 0.5)
         ax.axvline(x = myTicks[1], color = "#000000", linestyle = "-", linewidth = 0.5)
-        ax.set_xlabel("CT number at high kVp", labelpad = -10)
+        ax.set_xlabel("CT number at high kVp", labelpad = 0)
         ax.set_ylabel("CT number at low kVp" , labelpad = -20)
 
         self.AddDelimitingLinesToImage(ax)
