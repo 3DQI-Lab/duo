@@ -9,6 +9,11 @@ Duo, a Python API (GNU General Public License v3.0), is an Effective Atomic Numb
 ## Documentation
 [Documentation](https://duo-doc.readthedocs.io/en/latest/)
 
+## Citation
+Please cite the following publication if Duo is used in your project:
+
+> Liu T, Hong G, Cai W. A comparative study of effective atomic number calculations for dual-energy CT. *Med. Phys.*. 2021;1-16. https://doi.org/10.1002/mp.15166
+
 ## License
 Refer to [License](license.txt).
 

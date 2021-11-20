@@ -14,6 +14,12 @@ Duo Developers Manual
 
    3DQI is a research software for medical image analysis. The binaries are free to use, and can be requested via email to ``Cai.Wenli@mgh.harvard.edu``.
 
+.. note::
+
+   Please cite the following publication if Duo is used in your project:
+
+   Liu T, Hong G, Cai W. A comparative study of effective atomic number calculations for dual-energy CT. *Med. Phys.*. 2021;1-16. https://doi.org/10.1002/mp.15166
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
