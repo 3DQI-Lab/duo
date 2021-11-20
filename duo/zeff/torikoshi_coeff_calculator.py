@@ -3,32 +3,7 @@ import duo.core.element as duoelement
 import duo.core.material as material
 import duo.core.element_table as element_table
 import duo.core.material as material
-import scipy
-import scipy.optimize
-
-#------------------------------------------------------------
-#------------------------------------------------------------
-def FFunc(T, a, b, c, d, f, g):
-    Z, energy = T
-    result = a * Z * Z +\
-             b * Z * energy +\
-             c * energy * energy +\
-             d * Z +\
-             f * energy +\
-             g
-    return result
-
-#------------------------------------------------------------
-#------------------------------------------------------------
-def GFunc(T, a, b, c, d, f, g):
-    Z, energy = T
-    result = a * Z * Z +\
-             b * Z * energy +\
-             c * energy * energy +\
-             d * Z +\
-             f * energy +\
-             g
-    return result
+import numpy.polynomial.polynomial as poly
 
 #------------------------------------------------------------
 #------------------------------------------------------------
@@ -38,139 +13,109 @@ class TorikoshiCoeffCalculator:
     def __init__(self, elementTable):
         self.elementTable = elementTable
 
-        self.a_F = 0.0
-        self.b_F = 0.0
-        self.c_F = 0.0
-        self.d_F = 0.0
-        self.f_F = 0.0
-        self.g_F = 0.0
-
-        self.a_G = 0.0
-        self.b_G = 0.0
-        self.c_G = 0.0
-        self.d_G = 0.0
-        self.f_G = 0.0
-        self.g_G = 0.0
-
-        self.Parameterize()
+        self.fList = []
+        self.gList = []
+        self.aList = []
 
     #------------------------------------------------------------
     #------------------------------------------------------------
-    def Parameterize(self):
-        startZ = 1
-        stopZ = 20
-        ZList = np.arange(startZ, stopZ + 1)
+    def ParameterizeAtE(self, energy):
+        """Calculate parameters at the given photon energy
 
-        startEnergy = 50.0
-        stopEnergy = 100.0
-        numPoints = 81
-        energyList = np.linspace(startEnergy, stopEnergy, numPoints)
+        :param energy: Photon energy in keV.
+        :type energy: float.
+
+        """
+
+        ZList = np.arange(1, 20 + 1)
+
+        # the new numpy.polynomial.polynomial module
+        # uses the following order:
+        # p(x) = p[0] +
+        #        p[1] * x +
+        #        p[deg - 1] * x^(deg - 1) +
+        #        p[deg] * x^deg
+        # the polynomial has a total of (deg + 1) terms
+        # p[0] is the constant term
+        # p[deg] is the coef of the highest degree term
 
         # derive parameters for F(Z, E)
-        ZFullList = []
-        energyFullList = []
-        xsFullList = []
-
+        fDegree = 4 #
+        xs_list = []
         for Z in ZList:
             element = self.elementTable.elementList[Z]
-            for energy in energyList:
-                ZFullList.append(Z)
-                energyFullList.append(energy)
-
-                xs = element.CalculatePEMicroXSAtE(energy) / np.power(Z, 5.0)
-                xsFullList.append(xs)
-
-
-        result = scipy.optimize.curve_fit(FFunc,
-                    (ZFullList, energyFullList),
-                    xsFullList)
-        self.a_F = result[0][0]
-        self.b_F = result[0][1]
-        self.c_F = result[0][2]
-        self.d_F = result[0][3]
-        self.f_F = result[0][4]
-        self.g_F = result[0][5]
-
-        print("    a_F = ", self.a_F)
-        print("    b_F = ", self.b_F)
-        print("    c_F = ", self.c_F)
-        print("    d_F = ", self.d_F)
-        print("    f_F = ", self.f_F)
-        print("    g_F = ", self.g_F)
-
-
+            xs = element.CalculatePEMicroXSAtE(energy) / np.power(Z, 5.0)
+            xs_list.append(xs)
+        self.fList = poly.polyfit(ZList, xs_list, fDegree)
 
         # derive parameters for G(Z, E)
-        ZFullList = []
-        energyFullList = []
-        xsFullList = []
-
+        gDegree = 3
+        xs_list = []
         for Z in ZList:
             element = self.elementTable.elementList[Z]
-            for energy in energyList:
-                ZFullList.append(Z)
-                energyFullList.append(energy)
+            xs = element.CalculateCSMicroXSAtE(energy) + element.CalculateRLMicroXSAtE(energy)
+            xs /= Z
+            xs_list.append(xs)
+        self.gList = poly.polyfit(ZList, xs_list, gDegree)
 
-                xs = element.CalculateCSMicroXSAtE(energy) + element.CalculateRLMicroXSAtE(energy)
-                xs /= Z
-                xsFullList.append(xs)
+        highestDeg = fDegree + 4
+        self.aList = [0 for idx in range(highestDeg + 1)]
 
+        # combine coefficients
+        for idx in range(gDegree + 1):
+            self.aList[idx] += self.gList[idx]
 
-        result = scipy.optimize.curve_fit(GFunc,
-                    (ZFullList, energyFullList),
-                    xsFullList)
-        self.a_G = result[0][0]
-        self.b_G = result[0][1]
-        self.c_G = result[0][2]
-        self.d_G = result[0][3]
-        self.f_G = result[0][4]
-        self.g_G = result[0][5]
+        for idx in range(fDegree + 1):
+            self.aList[idx + 4] += self.fList[idx]
 
-        print("    a_G = ", self.a_G)
-        print("    b_G = ", self.b_G)
-        print("    c_G = ", self.c_G)
-        print("    d_G = ", self.d_G)
-        print("    f_G = ", self.f_G)
-        print("    g_G = ", self.g_G)
 
     #------------------------------------------------------------
     #------------------------------------------------------------
-    def CalculateElectronXS(self, Z, energy):
-        return np.power(Z, 4.0) * FFunc((Z, energy),
-                                        self.a_F,
-                                        self.b_F,
-                                        self.c_F,
-                                        self.d_F,
-                                        self.f_F,
-                                        self.g_F) +\
-                                GFunc((Z, energy),
-                                      self.a_G,
-                                      self.b_G,
-                                      self.c_G,
-                                      self.d_G,
-                                      self.f_G,
-                                      self.g_G)
+    def CalculateElectronXS(self, Z):
+        """Given Z, calculate electron microscopic cross-section.
+        This method must be used after a call to :meth:`~ParameterizeAtE`,
+        which calculates parameters based on the given energy.
+
+        :param Z: Atomic number.
+        :type Z: int.
+
+        """
+        return np.power(Z, 4.0) * poly.polyval(Z, self.fList) + poly.polyval(Z, self.gList)
+
 
     #------------------------------------------------------------
     #------------------------------------------------------------
-    def CalculateF(self, Z, energy):
-        return FFunc((Z, energy),
-                    self.a_F,
-                    self.b_F,
-                    self.c_F,
-                    self.d_F,
-                    self.f_F,
-                    self.g_F)
+    def CalculateF(self, Z):
+        """Given Z, calculate F(energy, Z) function defined in Torikoshi 2003.
+        This method must be used after a call to :meth:`~ParameterizeAtE`,
+        which calculates parameters based on the given energy.
+
+        :param Z: Atomic number.
+        :type Z: int.
+
+        """
+
+        return poly.polyval(Z, self.fList)
 
     #------------------------------------------------------------
     #------------------------------------------------------------
-    def CalculateG(self, Z, energy):
-        return GFunc((Z, energy),
-                    self.a_G,
-                    self.b_G,
-                    self.c_G,
-                    self.d_G,
-                    self.f_G,
-                    self.g_G)
+    def CalculateG(self, Z):
+        """Given Z, calculate G(energy, Z) function defined in Torikoshi 2003.
+        This method must be used after a call to :meth:`~ParameterizeAtE`,
+        which calculates parameters based on the given energy.
 
+        :param Z: Atomic number.
+        :type Z: int.
 
+        """
+
+        return poly.polyval(Z, self.gList)
+
+    #------------------------------------------------------------
+    #------------------------------------------------------------
+    def FindRoots(self, my_xs_tt):
+        coeffList = np.copy(self.aList)
+        coeffList[0] -= my_xs_tt
+        results = poly.polyroots(coeffList)
+
+        return results

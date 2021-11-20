@@ -120,7 +120,6 @@ class Bourque:
                 allRoots.append(root)
 
         if len(allRoots) > 1:
-            # print("--> WARNING: Bourque::CalculateZeffAtE(): more than one roots found!!!", allRoots)
             root = np.amin(allRoots)
 
         if root < 0.0:
